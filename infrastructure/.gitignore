@@ -1,0 +1,19 @@
+# misc
+.DS_Store
+.idea
+
+*.js
+!jest.config.js
+!.eslintrc.js
+*.d.ts
+!cognitoAtEdge.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+test_result
+coverage
+
+infrastructure/lib/constructs/app-cdn.auth-handler.config.json

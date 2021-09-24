@@ -1,0 +1,93 @@
+@use "~@awsui/design-tokens/index.scss" as awsui;
+
+#b {
+  // accommodate the space for the fixed header
+  padding-top: 54px;
+}
+
+#h {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  // corresponds to the z-index in Mezzanine
+  z-index: 1000;
+  margin: 0;
+  padding: 0 30px;
+  font-family: "Amazon Ember","Helvetica Neue",Roboto,Arial,sans-serif;
+  background: awsui.$color-background-home-header;
+
+}
+
+// temporary fix for this issue: https://issues.amazon.com/issues/AWSUI-10091
+// it is needed for 2.1 components and should be removed after we migrate Modal and TablePreferences
+.awsui-modal-open .awsui {
+  z-index: 2000;
+}
+
+// needs to be more specific than `.awsui ul` style
+.awsui ul.menu-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.awsui ul.menu-list > li {
+  padding: 0 4px;
+  margin: 13px 0 9px;
+}
+.awsui ul.menu-list > li a,
+.awsui ul.menu-list > li div,
+.awsui ul.menu-list > li button {
+  float: left;
+  color: awsui.$color-foreground-control-default;
+  line-height: 16px;
+}
+.awsui ul.menu-list > li a,
+.awsui ul.menu-list > li a:hover {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.awsui ul.menu-list > li.selected > a,
+.awsui ul.menu-list > li.selected > button {
+  font-weight: bold;
+  color: awsui.$color-text-accent;
+}
+
+.awsui ul.menu-list > .nav-chevron {
+  float: left;
+  color: awsui.$color-foreground-control-default !important;
+  margin-top: -3px;
+}
+
+.awsui ul.menu-list {
+  & > li.logo {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-right: 20px;
+  }
+  & > li.title {
+    font-weight: bold;
+    margin-top: 14px;
+    margin-top: 14px;
+  }
+}
+
+.awsui ul.menu-list > li.separated {
+  border-left: 1px solid #aab7b8;
+  border-left: 1px solid var(--color-border-control-default-27WVST, #aab7b8);
+  padding-left: 9px;
+  margin-left: 9px;
+}
+.awsui ul.menu-list > li.ml-auto {
+  margin-left: auto;
+}
+
+.awsui-polaris-dark-mode .awsui-app-layout h2,
+.awsui-polaris-dark-mode .awsui-app-layout h3,
+.awsui-polaris-dark-mode .awsui-app-layout .awsui-util-container-header {
+  color: awsui.$color-text-heading-default;
+}

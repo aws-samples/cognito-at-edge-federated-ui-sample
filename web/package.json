@@ -1,0 +1,76 @@
+{
+  "name": "federated-ux",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@awsui/collection-hooks": "^1.0.18",
+    "@awsui/components-react": "^3.0.236",
+    "@awsui/design-tokens": "^3.0.13",
+    "@awsui/global-styles": "^1.0.9",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.7.6",
+    "@types/react": "^17.0.19",
+    "@types/react-dom": "^17.0.9",
+    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/parser": "^4.29.3",
+    "aws-amplify": "^4.2.5",
+    "classnames": "^2.3.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-react": "^7.25.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^5.2.1",
+    "react-scripts": "^4.0.3",
+    "recoil": "^0.4.1",
+    "sass": "^1.38.2",
+    "typescript": "^4.4.2",
+    "uuid": "^8.3.2",
+    "web-vitals": "^2.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:ci": "react-scripts test --watchAll=false --testResultsProcessor ./node_modules/jest-junit",
+    "eject": "react-scripts eject",
+    "lint": "eslint \"src/**\"",
+    "lint:fix": "eslint \"src/**\" --fix"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@testing-library/react-hooks": "^7.0.1",
+    "@types/react-router-dom": "^5.1.8",
+    "@types/uuid": "^8.3.1",
+    "jest-junit": "^12.2.0",
+    "ts-jest": "^27.0.5"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!(@awsui)/)"
+    ],
+    "moduleNameMapper": {
+      "aws-amplify": "<rootDir>/testing/mocks/aws-amplify.js"
+    }
+  }
+}
