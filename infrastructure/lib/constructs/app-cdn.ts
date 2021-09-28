@@ -23,6 +23,7 @@ const EMPTY_ARRAY_COUNT = 0;
 export class AppCdn extends cdk.Construct {
   private readonly _appName: string;
   private readonly _frontendS3Bucket: s3.Bucket;
+  private readonly _accessLogBucket: s3.Bucket;
   private _lambdaAtEdge: lambda.NodejsFunction;
   private _wafACL: wafv2.CfnWebACL;
   private _distribution: cloudfront.Distribution;
@@ -36,6 +37,15 @@ export class AppCdn extends cdk.Construct {
 
     const stack = cdk.Stack.of(this);
 
+    this._accessLogBucket = new s3.Bucket(this, 'access-log-bucket', {
+      accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
+      bucketName: `${stack.stackName}-${stack.region}-${stack.account}-logs`,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      enforceSSL: true,
+      serverAccessLogsPrefix: 'access-log-bucket/',
+    })
+
     /* S3 bucket for react app CDN */
     this._frontendS3Bucket = new s3.Bucket(this, 'frontend-bucket', {
       accessControl: s3.BucketAccessControl.PRIVATE,
@@ -45,6 +55,8 @@ export class AppCdn extends cdk.Construct {
       enforceSSL: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
+      serverAccessLogsBucket: this._accessLogBucket,
+      serverAccessLogsPrefix: 'frontent-bucket/',
     });
   }
 
@@ -147,6 +159,8 @@ export class AppCdn extends cdk.Construct {
       }],
       webAclId: this._wafACL?.attrArn,
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+      logBucket: this._accessLogBucket,
+      logFilePrefix: 'frontend-distribution/',
     });
 
     return this;

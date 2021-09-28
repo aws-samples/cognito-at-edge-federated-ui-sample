@@ -16,4 +16,4 @@ cdk.out
 test_result
 coverage
 
-infrastructure/lib/constructs/app-cdn.auth-handler.config.json
+lib/constructs/app-cdn.auth-handler.config.json
