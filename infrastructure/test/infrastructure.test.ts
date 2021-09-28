@@ -37,7 +37,7 @@ class FEStack {
 test('should contain only one S3 bucket', () => {
   // ACT
   const stack = FEStack.get();
-  const totalExpectedBuckets = 1;
+  const totalExpectedBuckets = 2;
 
   // ASSERT
 
