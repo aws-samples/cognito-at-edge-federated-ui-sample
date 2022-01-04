@@ -3,7 +3,6 @@
 import { AppLayout, Box, Grid, HelpPanel } from '@awsui/components-react';
 import './sample.scss';
 import { FC } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 import Navigation from '../../layout/navigation/navigation';
 import { Breadcrumb, BreadcrumbItem } from '../../layout/breadcrumb/breadcrumb';
 import { SideNavigationProps } from '@awsui/components-react/side-navigation';
@@ -11,9 +10,9 @@ import { useRecoilValue } from 'recoil';
 import { loggedUser } from '../../../state';
 import { Notifications } from '../../layout/notifications/notifications';
 
-/* eslint @typescript-eslint/no-magic-numbers: "off" */
-
-type SampleProps = RouteComponentProps<void>;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface SampleProps {
+}
 
 const sample: FC<SampleProps> = () => {
   const loggedInUser = useRecoilValue(loggedUser);
