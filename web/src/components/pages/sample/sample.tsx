@@ -10,6 +10,7 @@ import { useRecoilValue } from 'recoil';
 import { loggedUser } from '../../../state';
 import { Notifications } from '../../layout/notifications/notifications';
 
+/* eslint @typescript-eslint/no-magic-numbers: "off" */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SampleProps {
 }
