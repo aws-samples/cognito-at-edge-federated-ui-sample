@@ -13,7 +13,11 @@ const i18n = {
   awaitLogin: 'Please wait while we log you in...',
 };
 
-const homePage: FC<void> = () => {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface HomeProps {
+}
+
+const homePage: FC<HomeProps> = () => {
   const loggedInUser = useRecoilValue(loggedUser);
 
   return (

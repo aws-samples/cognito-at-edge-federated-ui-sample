@@ -1,3 +1,4 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-export * from './navigate';
+export * from './home/home';
+export * from './sample/sample';

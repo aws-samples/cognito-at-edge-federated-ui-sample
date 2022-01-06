@@ -2,3 +2,7 @@
 
 # misc
 .DS_Store
+.idea
+*.lock
+web/package-lock.json
+ci/node_modules
