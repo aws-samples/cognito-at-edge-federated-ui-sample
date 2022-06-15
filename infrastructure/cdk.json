@@ -1,7 +1,7 @@
 {
   "app": "npx ts-node --prefer-ts-exts bin/infrastructure.ts",
   "context": {
-    "app-name": "dk-test-app-3",
+    "app-name": "my-unique-app-name",
     "waf-ip-greenlist": [ ],
     "@aws-cdk/core:stackRelativeExports": "true"
   }
