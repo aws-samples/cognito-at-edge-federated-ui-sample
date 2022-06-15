@@ -1,14 +1,16 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as cdk from '@aws-cdk/core';
-import * as cognito from '@aws-cdk/aws-cognito';
-import * as iam from '@aws-cdk/aws-iam';
+import { Construct } from 'constructs';
+import { Stack, SecretValue } from 'aws-cdk-lib'; 
+import { 
+  aws_cognito as cognito,
+  aws_iam as iam,
+} from 'aws-cdk-lib'; 
 import { IdentityPool } from './identity-pool';
-import { UserPoolIdentityProviderOpenId } from './user-pool-identity-provider-oidc';
-import { SecretValue } from '@aws-cdk/core';
+import { ProviderAttribute, UserPoolIdentityProviderOidc } from 'aws-cdk-lib/aws-cognito';
 
 
-export class WebUserPool extends cdk.Construct {
+export class WebUserPool extends Construct {
 
   private readonly _userPool: cognito.UserPool;
   private readonly _appName: string;
@@ -16,7 +18,7 @@ export class WebUserPool extends cdk.Construct {
   private _userPoolClient: cognito.UserPoolClient;
   private _userPoolDomain: cognito.UserPoolDomain;
 
-  constructor(scope: cdk.Construct, id: string, props: {
+  constructor(scope: Construct, id: string, props: {
     appName: string,
   }) {
     super(scope, id);
@@ -60,9 +62,9 @@ export class WebUserPool extends cdk.Construct {
 
   withIdentityProvider(identityProviderSecretName: string): WebUserPool {
 
-    this._userPool.registerIdentityProvider(new UserPoolIdentityProviderOpenId(this, 'oidc-provider', {
+    this._userPool.registerIdentityProvider(new UserPoolIdentityProviderOidc(this, 'oidc-provider', {
       userPool: this._userPool,
-      providerName: 'MyCorpOIDC',
+      name: 'MyCorpOIDC',
       clientId: SecretValue.
         secretsManager(identityProviderSecretName, {
           jsonField: 'ClientID'
@@ -75,7 +77,10 @@ export class WebUserPool extends cdk.Construct {
         secretsManager(identityProviderSecretName, {
           jsonField: 'Issuer'
         }).toString(),
-      scopes: 'openid email'
+      scopes: ['openid', 'email'],
+      attributeMapping: {
+        email: ProviderAttribute.other('email'),
+      },
     }));
 
     return this;
@@ -112,7 +117,7 @@ export class WebUserPool extends cdk.Construct {
 
   withApiAccess(restApiId: string): WebUserPool {
 
-    const stack = cdk.Stack.of(this);
+    const stack = Stack.of(this);
 
     /* Identity Pool for REST api access */
 
@@ -140,7 +145,7 @@ export class WebUserPool extends cdk.Construct {
   }
 
   getUserPoolLoginFQDN(): string {
-    const stack = cdk.Stack.of(this);
+    const stack = Stack.of(this);
 
     return `${this._userPoolDomain.domainName}.auth.${stack.region}.amazoncognito.com`;
   }

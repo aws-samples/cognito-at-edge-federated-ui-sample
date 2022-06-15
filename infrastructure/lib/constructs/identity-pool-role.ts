@@ -1,19 +1,21 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
+import { Construct } from 'constructs';
+import { 
+  aws_iam as iam,
+} from 'aws-cdk-lib'; 
 
 export enum IdentityPoolRoleTypeEnum {
   Authenticated = 'authenticated',
   Unauthenticated = 'unauthenticated'
 }
 
-export class IdentityPoolRole extends cdk.Construct {
+export class IdentityPoolRole extends Construct {
 
   private readonly _identityPoolRole: iam.Role;
 
   constructor(
-    scope: cdk.Construct,
+    scope: Construct,
     id: string,
     props: { roleType: IdentityPoolRoleTypeEnum, identityPoolId: string }) {
     super(scope, id);

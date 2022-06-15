@@ -2,11 +2,11 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
+import { App } from 'aws-cdk-lib'; 
 import { InfrastructureStack } from '../lib/infrastructure-stack';
 import { getStackName } from './conventions';
 
-const app = new cdk.App();
+const app = new App();
 const appName = app.node.tryGetContext('app-name');
 let wafIpGreenlist: string[] = app.node.tryGetContext('waf-ip-greenlist');
 

@@ -14,7 +14,6 @@
     "lint:fix": "eslint \"**/*.ts\" --fix"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "^1.137.0",
     "@types/aws-lambda": "^8.10.89",
     "@types/jest": "^27.0.3",
     "@types/jsonwebtoken": "^8.5.6",
@@ -32,16 +31,8 @@
     "typescript": "~4.5.4"
   },
   "dependencies": {
-    "@aws-cdk/aws-cloudfront": "^1.137.0",
-    "@aws-cdk/aws-cloudfront-origins": "^1.137.0",
-    "@aws-cdk/aws-cognito": "^1.137.0",
-    "@aws-cdk/aws-iam": "^1.137.0",
-    "@aws-cdk/aws-lambda": "^1.137.0",
-    "@aws-cdk/aws-lambda-nodejs": "^1.137.0",
-    "@aws-cdk/aws-s3": "^1.137.0",
-    "@aws-cdk/aws-ssm": "^1.137.0",
-    "@aws-cdk/aws-wafv2": "^1.137.0",
-    "@aws-cdk/core": "^1.137.0",
+    "aws-cdk-lib": "^2.0.0",
+    "constructs": "^10.0.0",
     "@aws-sdk/client-ssm": "^3.45.0",
     "aws-lambda": "^1.0.7",
     "axios": "0.24.0",

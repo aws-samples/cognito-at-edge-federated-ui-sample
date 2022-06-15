@@ -27,7 +27,7 @@ This is an infrastructure CDK template for User Interface CloudFormation stack.
    ./setup_prereqs.sh my-test-app aws-profile-name
    ```
 
-   This script will ask for OIDC client ID, secret and issuer. It will then store them in a Secrets Manager secret for the stack to use. 
+   This script will ask for OIDC client ID, secret and issuer. It will then store them in a Secrets Manager secret for the stack to use. Ensure that the OIDC client configuration contains mapping for `email` attribute.
 
    This can also be done in the AWS Console instead. Create a secret in the Secrets Manager with a name: `{app_name}/oidc` and secret value:
    ```json

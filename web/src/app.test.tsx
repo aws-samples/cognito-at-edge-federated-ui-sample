@@ -7,7 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { act } from 'react-dom/test-utils';
 
 describe('Unauthenticated Home Screen', () => {
-  it('displays Welcome to Industrial Cloud text', async () => {
+  it('displays Welcome to Sample Application text', async () => {
 
     // ACT
     act(() => {

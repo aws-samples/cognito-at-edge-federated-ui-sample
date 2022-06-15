@@ -1,8 +1,12 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as cdk from '@aws-cdk/core';
-import * as cognito from '@aws-cdk/aws-cognito';
-import * as iam from '@aws-cdk/aws-iam';
+import { Construct } from 'constructs';
+import { 
+  aws_cognito as cognito,
+  aws_iam as iam,
+} from 'aws-cdk-lib'; 
+
+
 import { IdentityPoolRole, IdentityPoolRoleTypeEnum } from './identity-pool-role';
 
 export interface IdentityPoolProps {
@@ -12,11 +16,11 @@ export interface IdentityPoolProps {
   authenticatedRolePolicies: iam.PolicyStatement[],
 }
 
-export class IdentityPool extends cdk.Construct {
+export class IdentityPool extends Construct {
 
   private readonly _identityPool: cognito.CfnIdentityPool;
 
-  constructor(scope: cdk.Construct, id: string, props: IdentityPoolProps) {
+  constructor(scope: Construct, id: string, props: IdentityPoolProps) {
     super(scope, id);
 
     this._identityPool = new cognito.CfnIdentityPool(this, 'identity-pool', {
