@@ -1,12 +1,13 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as cdk from '@aws-cdk/core';
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'; 
+import { Construct } from 'constructs';
 import { WebUserPool } from './constructs/app-user-pool';
 import { AppCdn } from './constructs/app-cdn';
 
-export class InfrastructureStack extends cdk.Stack {
+export class InfrastructureStack extends Stack {
 
-  constructor(scope: cdk.Construct, id: string, props: cdk.StackProps & {
+  constructor(scope: Construct, id: string, props: StackProps & {
     appName: string,
     wafIpGreenlist: string[],
   }) {
@@ -29,37 +30,37 @@ export class InfrastructureStack extends cdk.Stack {
     webUserPool.withApiAccess('ApiIDPlaceholder');
 
     /* Outputs */
-    new cdk.CfnOutput(this, 'ic-web-client-id-output', {
+    new CfnOutput(this, 'ic-web-client-id-output', {
       exportName: `${this.stackName}-IcWebClientId`,
       value: webUserPool.getUserPoolClientId()
     });
 
-    new cdk.CfnOutput(this, 'cdn-fqdn-output', {
+    new CfnOutput(this, 'cdn-fqdn-output', {
       exportName: `${this.stackName}-CdnFqdn`,
       value: cdn.getDomainName(),
     });
 
-    new cdk.CfnOutput(this, 'cdn-distribution-id-output', {
+    new CfnOutput(this, 'cdn-distribution-id-output', {
       exportName: `${this.stackName}-CdnDistributionId`,
       value: cdn.getDistributionId(),
     });
 
-    new cdk.CfnOutput(this, 'ic-frontend-s3-output', {
+    new CfnOutput(this, 'ic-frontend-s3-output', {
       exportName: `${this.stackName}-S3BucketName`,
       value: cdn.getBucketName(),
     });
 
-    new cdk.CfnOutput(this, 'ic-identity-pool-output', {
+    new CfnOutput(this, 'ic-identity-pool-output', {
       exportName: `${this.stackName}-IdentityPool`,
       value: webUserPool.getIdentityPoolId(),
     });
 
-    new cdk.CfnOutput(this, 'user-pool-output-id', {
+    new CfnOutput(this, 'user-pool-output-id', {
       exportName: `${this.stackName}-UserPoolId`,
       value: webUserPool.getUserPoolId(),
     });
 
-    new cdk.CfnOutput(this, 'user-pool-output-domain', {
+    new CfnOutput(this, 'user-pool-output-domain', {
       exportName: `${this.stackName}-UserPoolDomain`,
       value: webUserPool.getUserPoolLoginFQDN()
     });

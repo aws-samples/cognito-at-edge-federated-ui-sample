@@ -1,16 +1,20 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as cdk from '@aws-cdk/core';
-import * as s3 from '@aws-cdk/aws-s3';
-import * as cloudfront from '@aws-cdk/aws-cloudfront';
-import * as origins from '@aws-cdk/aws-cloudfront-origins';
-import * as wafv2 from '@aws-cdk/aws-wafv2';
-import * as lambda from '@aws-cdk/aws-lambda-nodejs';
-import * as ssm from '@aws-cdk/aws-ssm';
-import * as iam from '@aws-cdk/aws-iam';
+import { Construct } from 'constructs';
+import { Stack, RemovalPolicy, Duration } from 'aws-cdk-lib'; 
+import { 
+  aws_s3 as s3,
+  aws_cloudfront as cloudfront,
+  aws_cloudfront_origins as origins,
+  aws_wafv2 as wafv2,
+  aws_lambda_nodejs as lambda_node,
+  aws_ssm as ssm,
+  aws_iam as iam,
+  aws_lambda as lambda,
+} from 'aws-cdk-lib'; 
+
 import fs from 'fs';
 import { WebUserPool } from './app-user-pool';
-import { Runtime } from '@aws-cdk/aws-lambda';
 
 enum HttpStatus {
   OK = 200,
@@ -20,22 +24,22 @@ enum HttpStatus {
 
 const EMPTY_ARRAY_COUNT = 0;
 
-export class AppCdn extends cdk.Construct {
+export class AppCdn extends Construct {
   private readonly _appName: string;
   private readonly _frontendS3Bucket: s3.Bucket;
   private readonly _accessLogBucket: s3.Bucket;
-  private _lambdaAtEdge: lambda.NodejsFunction;
+  private _lambdaAtEdge: lambda_node.NodejsFunction;
   private _wafACL: wafv2.CfnWebACL;
   private _distribution: cloudfront.Distribution;
 
-  constructor(scope: cdk.Construct, id: string, props: {
+  constructor(scope: Construct, id: string, props: {
     appName: string,
   }) {
     super(scope, id);
 
     this._appName = props.appName;
 
-    const stack = cdk.Stack.of(this);
+    const stack = Stack.of(this);
 
     this._accessLogBucket = new s3.Bucket(this, 'access-log-bucket', {
       accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
@@ -53,7 +57,7 @@ export class AppCdn extends cdk.Construct {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
       enforceSSL: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       serverAccessLogsBucket: this._accessLogBucket,
       serverAccessLogsPrefix: 'frontent-bucket/',
@@ -66,7 +70,7 @@ export class AppCdn extends cdk.Construct {
       return this;
     }
 
-    const stack = cdk.Stack.of(this);
+    const stack = Stack.of(this);
 
     const wafIPSet = new wafv2.CfnIPSet(this, 'frontend-waf-ipset', {
       name: `${stack.stackName}-corporate-ip-space`,
@@ -118,10 +122,10 @@ export class AppCdn extends cdk.Construct {
       AppName: this._appName,
     }, null, jsonIndentSpaces));
 
-    this._lambdaAtEdge = new lambda.NodejsFunction(this, 'auth-handler', {
-      runtime: Runtime.NODEJS_14_X,
+    this._lambdaAtEdge = new lambda_node.NodejsFunction(this, 'auth-handler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
     });
-    this._lambdaAtEdge.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+    this._lambdaAtEdge.applyRemovalPolicy(RemovalPolicy.RETAIN);
 
     return this;
   }
@@ -150,12 +154,12 @@ export class AppCdn extends cdk.Construct {
         httpStatus: HttpStatus.NotFound,
         responseHttpStatus: HttpStatus.OK,
         responsePagePath: '/index.html',
-        ttl: cdk.Duration.seconds(defaultErrorResponseTTLSeconds)
+        ttl: Duration.seconds(defaultErrorResponseTTLSeconds)
       }, {
         httpStatus: HttpStatus.Unauthorized,
         responseHttpStatus: HttpStatus.OK,
         responsePagePath: '/index.html',
-        ttl: cdk.Duration.seconds(defaultErrorResponseTTLSeconds)
+        ttl: Duration.seconds(defaultErrorResponseTTLSeconds)
       }],
       webAclId: this._wafACL?.attrArn,
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
@@ -193,7 +197,7 @@ export class AppCdn extends cdk.Construct {
       stringValue: userPool.getUserPoolClientId(),
     });
 
-    const stack = cdk.Stack.of(this);
+    const stack = Stack.of(this);
 
     this._lambdaAtEdge.addToRolePolicy(new iam.PolicyStatement({
       actions: ['ssm:GetParameter'],

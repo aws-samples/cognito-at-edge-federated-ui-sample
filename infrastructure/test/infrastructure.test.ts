@@ -1,24 +1,18 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 import {
-  expect as expectCDK,
-  haveResourceLike,
-  stringLike,
-  countResources,
-  objectLike,
-  haveOutput,
-  arrayWith
-} from '@aws-cdk/assert';
-import * as cdk from '@aws-cdk/core';
+  Capture, Match, Template
+} from 'aws-cdk-lib/assertions';
+import { App, Stack } from 'aws-cdk-lib'; 
 import * as Infrastructure from '../lib/infrastructure-stack';
 
 class FEStack {
 
-  private static _stack?: cdk.Stack;
+  private static _stack?: Stack;
 
   static get() {
     if (FEStack._stack === undefined) {
-      const app = new cdk.App();
+      const app = new App();
 
       FEStack._stack = new Infrastructure.InfrastructureStack(app, 'MyTestStack', {
         stackName: 'ui-test',
@@ -40,8 +34,8 @@ test('should contain only one S3 bucket', () => {
   const totalExpectedBuckets = 2;
 
   // ASSERT
-
-  expectCDK(stack).to(countResources('AWS::S3::Bucket', totalExpectedBuckets));
+  const template = Template.fromStack(stack);
+  template.resourceCountIs('AWS::S3::Bucket', totalExpectedBuckets);
 });
 
 test('S3 bucket should be private', () => {
@@ -51,16 +45,20 @@ test('S3 bucket should be private', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::S3::Bucket', {
-    BucketName: { 'Fn::Join': [ '', [ 'ui-test-us-east-1-', { Ref: 'AWS::AccountId' } ] ] },
-    AccessControl: 'Private',
-    PublicAccessBlockConfiguration: {
-      BlockPublicAcls: true,
-      BlockPublicPolicy: true,
-      IgnorePublicAcls: true,
-      RestrictPublicBuckets: true,
-    }
-  }));
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::S3::Bucket', 
+    Match.objectLike(
+      {
+        BucketName: { 'Fn::Join': [ '', [ 'ui-test-us-east-1-', { Ref: 'AWS::AccountId' } ] ] },
+        AccessControl: 'Private',
+        PublicAccessBlockConfiguration: {
+          BlockPublicAcls: true,
+          BlockPublicPolicy: true,
+          IgnorePublicAcls: true,
+          RestrictPublicBuckets: true,
+        }
+      }
+    ));
 });
 
 test('S3 bucket should have origin access policy configured', () => {
@@ -70,17 +68,19 @@ test('S3 bucket should have origin access policy configured', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::S3::BucketPolicy', {
-    Bucket: { Ref: stringLike('webappcdnfrontendbucket*') },
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::S3::BucketPolicy', 
+  Match.objectLike({
+    Bucket: { Ref: Match.stringLikeRegexp('webappcdnfrontendbucket.*') },
     PolicyDocument: {
-      Statement: arrayWith(objectLike({
+      Statement: Match.arrayWith([Match.objectLike({
         Action: 's3:GetObject',
         Principal: {
           CanonicalUser: {
-            'Fn::GetAtt': [ stringLike('webappcdnfrontenddistributionOrigin*'), 'S3CanonicalUserId' ]
+            'Fn::GetAtt': [ Match.stringLikeRegexp('webappcdnfrontenddistributionOrigin.*'), 'S3CanonicalUserId' ]
           }
         }
-      }))
+      })])
     }
   }));
 });
@@ -91,8 +91,8 @@ test('should contain one User Pool Client', () => {
   const totalExpectedUserPools = 1;
 
   // ASSERT
-
-  expectCDK(stack).to(countResources('AWS::Cognito::UserPoolClient', totalExpectedUserPools));
+  const template = Template.fromStack(stack);
+  template.resourceCountIs('AWS::Cognito::UserPoolClient', totalExpectedUserPools);
 });
 
 test('User Pool Client should have a CloudFront callback url', () => {
@@ -102,22 +102,23 @@ test('User Pool Client should have a CloudFront callback url', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::Cognito::UserPoolClient', {
-    CallbackURLs: [
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::Cognito::UserPoolClient', Match.objectLike({
+    CallbackURLs: Match.arrayWith([
       {
         'Fn::Join': [
           '',
           [ 'https://',
             {
               'Fn::GetAtt': [
-                stringLike('webappcdnfrontenddistribution*'),
+                Match.stringLikeRegexp('webappcdnfrontenddistribution.*'),
                 'DomainName'
               ]
             }
           ] ]
       }
-    ]
-  }));
+    ])
+  }))
 });
 
 test('User Pool Client should be configured only with MyCorpOIDC identity provider', () => {
@@ -127,8 +128,9 @@ test('User Pool Client should be configured only with MyCorpOIDC identity provid
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::Cognito::UserPoolClient', {
-    SupportedIdentityProviders: [ objectLike({ Ref: stringLike('webuserpooloidcprovider*') }) ],
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::Cognito::UserPoolClient', Match.objectLike({
+    SupportedIdentityProviders: Match.arrayWith([ Match.objectLike({ Ref: Match.stringLikeRegexp('webuserpooloidcprovider.*') }) ]),
   }));
 });
 
@@ -139,7 +141,8 @@ test('User Pool Client should be configured with authorization code grant flow o
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::Cognito::UserPoolClient', {
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::Cognito::UserPoolClient', Match.objectLike({
     AllowedOAuthFlows: [ 'code' ],
   }));
 });
@@ -151,7 +154,8 @@ test('User Pool Client should be configured with explicit auth flows', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::Cognito::UserPoolClient', {
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::Cognito::UserPoolClient', Match.objectLike({
     ExplicitAuthFlows: [ 'ALLOW_USER_PASSWORD_AUTH', 'ALLOW_USER_SRP_AUTH', 'ALLOW_REFRESH_TOKEN_AUTH' ],
   }));
 });
@@ -163,7 +167,8 @@ test('User Pool Client should be configured with openid, email and profile scope
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::Cognito::UserPoolClient', {
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::Cognito::UserPoolClient', Match.objectLike({
     AllowedOAuthScopes: [ 'openid', 'email', 'profile' ],
   }));
 });
@@ -176,7 +181,8 @@ test('should have ACL', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::WAFv2::WebACL', {
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::WAFv2::WebACL', Match.objectLike({
     DefaultAction: {
       Block: {}
     }
@@ -191,7 +197,8 @@ test('should have CloudFront distribution', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(countResources('AWS::CloudFront::Distribution', expectedDistributionCount));
+  const template = Template.fromStack(stack);
+  template.resourceCountIs('AWS::CloudFront::Distribution', expectedDistributionCount);
 });
 
 test('CloudFront distribution should have WAF configured', () => {
@@ -201,8 +208,9 @@ test('CloudFront distribution should have WAF configured', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::CloudFront::Distribution', {
-    DistributionConfig: { WebACLId: { 'Fn::GetAtt': [ stringLike('webappcdnfrontendwafacl*'), 'Arn' ] } }
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::CloudFront::Distribution', Match.objectLike({
+    DistributionConfig: { WebACLId: { 'Fn::GetAtt': [ Match.stringLikeRegexp('webappcdnfrontendwafacl.*'), 'Arn' ] } }
   }));
 });
 
@@ -213,12 +221,13 @@ test('CloudFront distribution should have Lambda@Edge auth lambda', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveResourceLike('AWS::CloudFront::Distribution', {
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::CloudFront::Distribution', Match.objectLike({
     DistributionConfig: {
       DefaultCacheBehavior: {
         LambdaFunctionAssociations: [{
           EventType: 'viewer-request',
-          LambdaFunctionARN: { Ref: stringLike('webappcdnauthhandler*') }
+          LambdaFunctionARN: { Ref: Match.stringLikeRegexp('webappcdnauthhandler.*') }
         }]
       }
     }
@@ -232,19 +241,10 @@ test('should contain required output parameters', () => {
   const stack = FEStack.get();
 
   // ASSERT
-  expectCDK(stack).to(haveOutput({
-    outputName: 'icwebclientidoutput',
-  }));
-  expectCDK(stack).to(haveOutput({
-    outputName: 'cdnfqdnoutput',
-  }));
-  expectCDK(stack).to(haveOutput({
-    outputName: 'cdndistributionidoutput',
-  }));
-  expectCDK(stack).to(haveOutput({
-    outputName: 'icfrontends3output',
-  }));
-  expectCDK(stack).to(haveOutput({
-    outputName: 'icidentitypooloutput',
-  }));
+  const template = Template.fromStack(stack);
+  template.hasOutput('icwebclientidoutput', Match.objectLike({}));
+  template.hasOutput('cdnfqdnoutput', Match.objectLike({}));
+  template.hasOutput('cdndistributionidoutput', Match.objectLike({}));
+  template.hasOutput('icfrontends3output', Match.objectLike({}));
+  template.hasOutput('icidentitypooloutput', Match.objectLike({}));
 });

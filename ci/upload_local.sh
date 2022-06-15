@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source ./ci/common.sh
-
 app_name=$1
 profile_name=$2
 default_region="us-east-1"
